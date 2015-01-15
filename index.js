@@ -25,9 +25,14 @@ var Client = function (options) {
   this.appId             = options.appId || env.OPBEAT_APP_ID;
   this.organizationId    = options.organizationId || env.OPBEAT_ORGANIZATION_ID;
   this.secretToken       = options.secretToken || env.OPBEAT_SECRET_TOKEN;
-  this.active            = ('active' in options ? options.active :
-                             ('OPBEAT_ACTIVE' in env ? env.OPBEAT_ACTIVE :
-                               undefined)) != false;
+
+  this.active = true;
+  if ('active' in options) {
+    if (typeof options.active === 'boolean') this.active = options.active
+    else if (options.active === 'false') this.active = false
+  }
+  else if('OPBEAT_ACTIVE' in env) this.active = env.OPBEAT_ACTIVE !== 'false'
+
   this.logger            = options.logger || require('console-log-level')({ level: clientLogLevel });
   this.hostname          = options.hostname || env.OPBEAT_HOSTNAME || os.hostname();
   this.stackTraceLimit   = 'stackTraceLimit' in options ? options.stackTraceLimit :

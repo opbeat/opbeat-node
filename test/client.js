@@ -80,7 +80,7 @@ optionFixtures.forEach(function (fixture) {
 
 test('should be configurable by envrionment variable OPBEAT_ACTIVE', function (t) {
   setup();
-  process.env.OPBEAT_ACTIVE = '0';
+  process.env.OPBEAT_ACTIVE = false;
   var client = opbeat({ appId: 'foo', organizationId: 'bar', secretToken: 'baz' });
   t.equal(client.active, false);
   delete process.env.OPBEAT_ACTIVE;
@@ -90,7 +90,7 @@ test('should be configurable by envrionment variable OPBEAT_ACTIVE', function (t
 test('should overwrite OPBEAT_ACTIVE by option property active', function (t) {
   setup();
   var options = { appId: 'foo', organizationId: 'bar', secretToken: 'baz', active: false };
-  process.env.OPBEAT_ACTIVE = '1';
+  process.env.OPBEAT_ACTIVE = true;
   var client = opbeat(options);
   t.equal(client.active, false);
   delete process.env.OPBEAT_ACTIVE;
