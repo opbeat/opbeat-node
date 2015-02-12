@@ -27,6 +27,8 @@ var Client = function (options) {
   this.stackTraceLimit = options.stackTraceLimit;
   this.captureExceptions = options.captureExceptions;
   this.exceptionLogLevel = options.exceptionLogLevel;
+  this.prerequestMethod = options.prerequestMethod;
+
   this.api = {
     host: options.apiHost,
     path: '/api/v1/organizations/' + options.organizationId + '/apps/' + options.appId + '/'
@@ -115,6 +117,13 @@ Client.prototype.handleUncaughtExceptions = function (callback) {
   this._uncaughtExceptionListener = function (err) {
     client.logger.debug('Opbeat caught unhandled exception');
 
+    //Collect extra information from the user if they provide a pre request method
+    var extra;
+
+    if(typeof client.prerequestMethod != 'undefined') {
+      extra = client.prerequestMethod();
+    }
+
     // Since we exit the node-process we cannot guarantee that the
     // listeners will be called, so to ensure a uniform result,
     // we'll remove all event listeners if an uncaught exception is
@@ -129,6 +138,11 @@ Client.prototype.handleUncaughtExceptions = function (callback) {
     var options = {
       level: client.exceptionLogLevel
     };
+
+    if(extra) {
+      options.extra = extra;
+    }
+
     client.captureError(err, options, function (opbeatErr, url) {
       if (opbeatErr) {
         client.logger.info('Could not notify Opbeat!');
