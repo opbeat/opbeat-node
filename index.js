@@ -17,7 +17,10 @@ var agent // singleton agent
 
 var Opbeat = module.exports = function (opts) {
   if (!(this instanceof Opbeat)) return new Opbeat(opts)
-  if (global.__opbeat_agent) throw new Error('Cannot initialize the Opbeat agent more than once')
+  if (global.__opbeat_agent) {
+    agent.logger.info('Cannot initialize the Opbeat agent more than once');
+    return agent;
+  }
   global.__opbeat_agent = true
   agent = this
 
