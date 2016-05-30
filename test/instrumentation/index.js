@@ -267,6 +267,81 @@ test('currentTrace missing - not recoverable', function (t) {
   })
 })
 
+test('leaf trace - nested', function (t) {
+  var agent = mockAgent(function (endpoint, data, cb) {
+    t.equal(data.traces.groups.length, 2)
+    t.equal(data.traces.groups[0].signature, 't0')
+    t.equal(data.traces.groups[1].signature, 'transaction')
+    t.end()
+  })
+  var ins = agent._instrumentation
+
+  var trans = ins.startTransaction('foo')
+  setImmediate(function () {
+    var t0 = startTrace(ins, 't0')
+    t0.leaf = true
+    setImmediate(function () {
+      var t1 = startTrace(ins, 't1')
+      t.equal(t1, null)
+      t0.end()
+      trans.end()
+      ins._send()
+    })
+  })
+})
+
+test('leaf trace - ended', function (t) {
+  var agent = mockAgent(function (endpoint, data, cb) {
+    t.equal(data.traces.groups.length, 3)
+    t.equal(data.traces.groups[0].signature, 't0')
+    t.equal(data.traces.groups[1].signature, 't1')
+    t.equal(data.traces.groups[2].signature, 'transaction')
+    t.end()
+  })
+  var ins = agent._instrumentation
+
+  var trans = ins.startTransaction('foo')
+  setImmediate(function () {
+    var t0 = startTrace(ins, 't0')
+    t0.leaf = true
+    setImmediate(function () {
+      t0.end()
+      var t1 = startTrace(ins, 't1')
+      setImmediate(function () {
+        t1.end()
+        trans.end()
+        ins._send()
+      })
+    })
+  })
+})
+
+test('leaf trace - same tick', function (t) {
+  var agent = mockAgent(function (endpoint, data, cb) {
+    t.equal(data.traces.groups.length, 3)
+    t.equal(data.traces.groups[0].signature, 't0')
+    t.equal(data.traces.groups[1].signature, 't1')
+    t.equal(data.traces.groups[2].signature, 'transaction')
+    t.end()
+  })
+  var ins = agent._instrumentation
+
+  var trans = ins.startTransaction('foo')
+  setImmediate(function () {
+    var t0 = startTrace(ins, 't0')
+    t0.leaf = true
+    var t1 = startTrace(ins, 't1')
+    setImmediate(function () {
+      t0.end()
+      setImmediate(function () {
+        t1.end()
+        trans.end()
+        ins._send()
+      })
+    })
+  })
+})
+
 function pointerChain (trace) {
   var arr = [trace.signature]
   var prev = trace._parent
