@@ -76,7 +76,7 @@
     "pg": "^6.1.0",
     "redis": "^2.6.3",
     "restify": "^4.2.0",
-    "standard": "^8.4.0",
+    "standard": "^8.6.0",
     "tape": "^4.6.2",
     "test-all-versions": "^2.0.0",
     "untildify": "^3.0.2"
