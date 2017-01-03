@@ -11,7 +11,8 @@ var opts = {
   organizationId: 'some-org-id',
   appId: 'some-app-id',
   secretToken: 'secret',
-  captureExceptions: false
+  captureExceptions: false,
+  logLevel: 'silent'
 }
 
 var data = { extra: { uuid: 'foo' } }

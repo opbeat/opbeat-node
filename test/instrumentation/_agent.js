@@ -4,7 +4,7 @@ var Instrumentation = require('../../lib/instrumentation')
 var Filters = require('../../lib/filters')
 var logger = require('../../lib/logger')
 
-logger.init({ level: 'fatal' })
+logger.init('silent')
 
 var noop = function () {}
 var sharedInstrumentation

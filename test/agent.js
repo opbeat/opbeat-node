@@ -14,14 +14,14 @@ var opts = {
   organizationId: 'some-org-id',
   appId: 'some-app-id',
   secretToken: 'secret',
-  captureExceptions: false
+  captureExceptions: false,
+  logLevel: 'silent'
 }
 
 var optionFixtures = [
   ['appId', 'APP_ID'],
   ['organizationId', 'ORGANIZATION_ID'],
   ['secretToken', 'SECRET_TOKEN'],
-  ['logLevel', 'LOG_LEVEL', 'info'],
   ['hostname', 'HOSTNAME', os.hostname()],
   ['stackTraceLimit', 'STACK_TRACE_LIMIT', Infinity],
   ['captureExceptions', 'CAPTURE_EXCEPTIONS', true],
@@ -59,7 +59,7 @@ optionFixtures.forEach(function (fixture) {
       var bool = typeof fixture[2] === 'boolean'
       var value = bool ? (fixture[2] ? '0' : '1') : 'custom-value'
       process.env['OPBEAT_' + fixture[1]] = value
-      opbeat.start()
+      opbeat.start({logLevel: 'silent'})
       t.equal(opbeat[fixture[0]], bool ? !fixture[2] : value)
       delete process.env['OPBEAT_' + fixture[1]]
       t.end()
@@ -67,7 +67,7 @@ optionFixtures.forEach(function (fixture) {
 
     test('should overwrite OPBEAT_' + fixture[1] + ' by option property ' + fixture[0], function (t) {
       setup()
-      var opts = {}
+      var opts = {logLevel: 'silent'}
       var bool = typeof fixture[2] === 'boolean'
       var value1 = bool ? (fixture[2] ? '0' : '1') : 'overwriting-value'
       var value2 = bool ? (fixture[2] ? '1' : '0') : 'custom-value'
@@ -82,7 +82,7 @@ optionFixtures.forEach(function (fixture) {
 
   test('should default ' + fixture[0] + ' to ' + fixture[2], function (t) {
     setup()
-    opbeat.start()
+    opbeat.start({logLevel: 'silent'})
     t.equal(opbeat[fixture[0]], fixture[2])
     t.end()
   })
@@ -92,7 +92,7 @@ falsyValues.forEach(function (val) {
   test('should be disabled by envrionment variable OPBEAT_ACTIVE set to: ' + util.inspect(val), function (t) {
     setup()
     process.env.OPBEAT_ACTIVE = val
-    opbeat.start({ appId: 'foo', organizationId: 'bar', secretToken: 'baz' })
+    opbeat.start({appId: 'foo', organizationId: 'bar', secretToken: 'baz', logLevel: 'silent'})
     t.equal(opbeat.active, false)
     delete process.env.OPBEAT_ACTIVE
     t.end()
@@ -103,7 +103,7 @@ truthyValues.forEach(function (val) {
   test('should be enabled by envrionment variable OPBEAT_ACTIVE set to: ' + util.inspect(val), function (t) {
     setup()
     process.env.OPBEAT_ACTIVE = val
-    opbeat.start({ appId: 'foo', organizationId: 'bar', secretToken: 'baz' })
+    opbeat.start({appId: 'foo', organizationId: 'bar', secretToken: 'baz', logLevel: 'silent'})
     t.equal(opbeat.active, true)
     delete process.env.OPBEAT_ACTIVE
     t.end()
@@ -112,7 +112,7 @@ truthyValues.forEach(function (val) {
 
 test('should overwrite OPBEAT_ACTIVE by option property active', function (t) {
   setup()
-  var opts = { appId: 'foo', organizationId: 'bar', secretToken: 'baz', active: false }
+  var opts = {appId: 'foo', organizationId: 'bar', secretToken: 'baz', active: false, logLevel: 'silent'}
   process.env.OPBEAT_ACTIVE = '1'
   opbeat.start(opts)
   t.equal(opbeat.active, false)
@@ -122,28 +122,28 @@ test('should overwrite OPBEAT_ACTIVE by option property active', function (t) {
 
 test('should default active to true if required options have been specified', function (t) {
   setup()
-  opbeat.start({ appId: 'foo', organizationId: 'bar', secretToken: 'baz' })
+  opbeat.start({appId: 'foo', organizationId: 'bar', secretToken: 'baz', logLevel: 'silent'})
   t.equal(opbeat.active, true)
   t.end()
 })
 
 test('should default active to false if required options have not been specified', function (t) {
   setup()
-  opbeat.start()
+  opbeat.start({logLevel: 'silent'})
   t.equal(opbeat.active, false)
   t.end()
 })
 
 test('should force active to false if required options have not been specified', function (t) {
   setup()
-  opbeat.start({ active: true })
+  opbeat.start({active: true, logLevel: 'silent'})
   t.equal(opbeat.active, false)
   t.end()
 })
 
 test('should default to empty request blacklist arrays', function (t) {
   setup()
-  opbeat.start()
+  opbeat.start({logLevel: 'silent'})
   t.equal(opbeat._ignoreUrlStr.length, 0)
   t.equal(opbeat._ignoreUrlRegExp.length, 0)
   t.equal(opbeat._ignoreUserAgentStr.length, 0)
@@ -155,7 +155,8 @@ test('should separate strings and regexes into their own blacklist arrays', func
   setup()
   opbeat.start({
     ignoreUrls: ['str1', /regex1/],
-    ignoreUserAgents: ['str2', /regex2/]
+    ignoreUserAgents: ['str2', /regex2/],
+    logLevel: 'silent'
   })
 
   t.deepEqual(opbeat._ignoreUrlStr, ['str1'])
@@ -275,7 +276,8 @@ test('#captureError()', function (t) {
     var opts = {
       appId: 'foo',
       organizationId: 'bar',
-      secretToken: 'baz'
+      secretToken: 'baz',
+      logLevel: 'silent'
     }
     opbeat.addFilter(function (data) {
       t.equal(++data.extra.order, 1)
@@ -299,7 +301,8 @@ test('#captureError()', function (t) {
     var opts = {
       appId: 'foo',
       organizationId: 'bar',
-      secretToken: 'baz'
+      secretToken: 'baz',
+      logLevel: 'silent'
     }
     opbeat.addFilter(function () {})
     opbeat.addFilter(function () {
@@ -319,7 +322,7 @@ test('#captureError()', function (t) {
   t.test('should anonymize the http Authorization header by default', function (t) {
     t.plan(2)
     setup()
-    opbeat.start({ appId: 'foo', organizationId: 'bar', secretToken: 'baz' })
+    opbeat.start({appId: 'foo', organizationId: 'bar', secretToken: 'baz', logLevel: 'silent'})
 
     var oldErrorFn = request.error
     request.error = function (agent, data, cb) {
@@ -353,7 +356,8 @@ test('#captureError()', function (t) {
       appId: 'foo',
       organizationId: 'bar',
       secretToken: 'baz',
-      filterHttpHeaders: false
+      filterHttpHeaders: false,
+      logLevel: 'silent'
     })
 
     var oldErrorFn = request.error
