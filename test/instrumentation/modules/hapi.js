@@ -37,6 +37,19 @@ test('route naming', function (t) {
   })
 })
 
+test('connectionless', function (t) {
+  t.plan(1)
+
+  resetAgent(function () {
+    server.stop()
+  })
+
+  var server = new Hapi.Server()
+  server.initialize((err) => {
+      t.error(err);
+  });
+})
+
 test('error handling', function (t) {
   t.plan(21)
 
