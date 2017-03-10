@@ -45,7 +45,7 @@ test('connectionless', function (t) {
   })
 
   var server = new Hapi.Server()
-  server.initialize((err) => {
+  server.initialize(function (err) {
     t.error(err)
   })
 })
