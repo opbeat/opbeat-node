@@ -46,7 +46,6 @@ test('connectionless', function (t) {
   server.initialize(function (err) {
     server.stop()
     t.error(err)
-    t.end()
   })
 })
 
