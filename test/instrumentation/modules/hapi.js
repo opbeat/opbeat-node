@@ -45,7 +45,254 @@ test('connectionless', function (t) {
   var server = new Hapi.Server()
   server.initialize(function (err) {
     server.stop()
-    t.error(err)
+    t.error(err, 'start error')
+  })
+})
+
+test('server error logging with Error', function (t) {
+  t.plan(8)
+
+  var customError = new Error('custom error')
+
+  resetAgent(function (endpoint, headers, data, cb) {
+    t.equal(endpoint, 'transactions')
+    t.deepEqual(data, { transactions: [], traces: { groups: [], raw: [] } })
+
+    server.stop()
+  })
+
+  agent.captureError = function (err, opts) {
+    t.equal(err, customError)
+    t.ok(opts.extra)
+    t.deepEqual(opts.extra.tags, { error: true })
+    t.false(opts.extra.internals)
+    t.ok(opts.extra.data instanceof Error)
+  }
+
+  var server = new Hapi.Server()
+  server.connection()
+
+  server.start(function (err) {
+    t.error(err, 'start error')
+
+    server.log(['error'], customError)
+
+    agent._instrumentation._queue._flush()
+  })
+})
+
+test('server error logging with String', function (t) {
+  t.plan(8)
+
+  var customError = 'custom error'
+
+  resetAgent(function (endpoint, headers, data, cb) {
+    t.equal(endpoint, 'transactions')
+    t.deepEqual(data, { transactions: [], traces: { groups: [], raw: [] } })
+
+    server.stop()
+  })
+
+  agent.captureError = function (err, opts) {
+    t.equal(err, customError)
+    t.ok(opts.extra)
+    t.deepEqual(opts.extra.tags, { error: true })
+    t.false(opts.extra.internals)
+    t.ok(typeof opts.extra.data === 'string')
+  }
+
+  var server = new Hapi.Server()
+  server.connection()
+
+  server.start(function (err) {
+    t.error(err, 'start error')
+
+    server.log(['error'], customError)
+
+    agent._instrumentation._queue._flush()
+  })
+})
+
+test('server error logging with Object', function (t) {
+  t.plan(8)
+
+  var customError = {
+    error: 'I forgot to turn this into an actual Error'
+  }
+
+  resetAgent(function (endpoint, headers, data, cb) {
+    t.equal(endpoint, 'transactions')
+    t.deepEqual(data, { transactions: [], traces: { groups: [], raw: [] } })
+
+    server.stop()
+  })
+
+  agent.captureError = function (err, opts) {
+    t.equal(err, 'hapi server emitted a log event tagged error')
+    t.ok(opts.extra)
+    t.deepEqual(opts.extra.tags, { error: true })
+    t.false(opts.extra.internals)
+    t.deepEqual(opts.extra.data, customError)
+  }
+
+  var server = new Hapi.Server()
+  server.connection()
+
+  server.start(function (err) {
+    t.error(err, 'start error')
+
+    server.log(['error'], customError)
+
+    agent._instrumentation._queue._flush()
+  })
+})
+
+test('request error logging with Error', function (t) {
+  t.plan(25)
+
+  var customError = new Error('custom error')
+
+  resetAgent(function (endpoint, headers, data, cb) {
+    assert(t, data, { status: 200, name: 'GET /error' })
+
+    server.stop()
+  })
+
+  agent.captureError = function (err, opts) {
+    t.equal(err, customError)
+    t.ok(opts.extra)
+    t.ok(opts.request)
+    t.deepEqual(opts.extra.tags, { error: true })
+    t.false(opts.extra.internals)
+    t.ok(opts.extra.data instanceof Error)
+  }
+
+  var server = new Hapi.Server()
+  server.connection()
+
+  server.route({
+    method: 'GET',
+    path: '/error',
+    handler: function (request, reply) {
+      request.log(['error'], customError)
+
+      return reply('hello world')
+    }
+  })
+
+  server.start(function (err) {
+    t.error(err, 'start error')
+
+    http.get('http://localhost:' + server.info.port + '/error', function (res) {
+      t.equal(res.statusCode, 200)
+
+      res.on('data', function (chunck) {
+          // I need to read this to make `res` end
+      })
+      res.on('end', function () {
+        agent._instrumentation._queue._flush()
+      })
+    })
+  })
+})
+
+test('request error logging with String', function (t) {
+  t.plan(25)
+
+  var customError = 'custom error'
+
+  resetAgent(function (endpoint, headers, data, cb) {
+    assert(t, data, { status: 200, name: 'GET /error' })
+
+    server.stop()
+  })
+
+  agent.captureError = function (err, opts) {
+    t.equal(err, customError)
+    t.ok(opts.extra)
+    t.ok(opts.request)
+    t.deepEqual(opts.extra.tags, { error: true })
+    t.false(opts.extra.internals)
+    t.ok(typeof opts.extra.data === 'string')
+  }
+
+  var server = new Hapi.Server()
+  server.connection()
+
+  server.route({
+    method: 'GET',
+    path: '/error',
+    handler: function (request, reply) {
+      request.log(['error'], customError)
+
+      return reply('hello world')
+    }
+  })
+
+  server.start(function (err) {
+    t.error(err, 'start error')
+
+    http.get('http://localhost:' + server.info.port + '/error', function (res) {
+      t.equal(res.statusCode, 200)
+
+      res.on('data', function (chunck) {
+          // I need to read this to make `res` end
+      })
+      res.on('end', function () {
+        agent._instrumentation._queue._flush()
+      })
+    })
+  })
+})
+
+test('request error logging with Object', function (t) {
+  t.plan(25)
+
+  var customError = {
+    error: 'I forgot to turn this into an actual Error'
+  }
+
+  resetAgent(function (endpoint, headers, data, cb) {
+    assert(t, data, { status: 200, name: 'GET /error' })
+
+    server.stop()
+  })
+
+  agent.captureError = function (err, opts) {
+    t.equal(err, 'hapi server emitted a request event tagged error')
+    t.ok(opts.extra)
+    t.ok(opts.request)
+    t.deepEqual(opts.extra.tags, { error: true })
+    t.false(opts.extra.internals)
+    t.deepEqual(opts.extra.data, customError)
+  }
+
+  var server = new Hapi.Server()
+  server.connection()
+
+  server.route({
+    method: 'GET',
+    path: '/error',
+    handler: function (request, reply) {
+      request.log(['error'], customError)
+
+      return reply('hello world')
+    }
+  })
+
+  server.start(function (err) {
+    t.error(err, 'start error')
+
+    http.get('http://localhost:' + server.info.port + '/error', function (res) {
+      t.equal(res.statusCode, 200)
+
+      res.on('data', function (chunck) {
+          // I need to read this to make `res` end
+      })
+      res.on('end', function () {
+        agent._instrumentation._queue._flush()
+      })
+    })
   })
 })
 
