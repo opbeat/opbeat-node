@@ -1,3 +1,6 @@
+# 3.9.1 - 2017/3/13 (maintenance release)
+  * core: fix bug related to net.connect in Node.js v7.7.2 (backported from v4.11.2)
+
 # 3.9.0 - 2016/7/15
   * mongodb: instrument mongodb-core v2.x
 
