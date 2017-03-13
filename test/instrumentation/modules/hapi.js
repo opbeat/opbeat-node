@@ -40,13 +40,13 @@ test('route naming', function (t) {
 test('connectionless', function (t) {
   t.plan(1)
 
-  resetAgent(function () {
-    server.stop()
-  })
+  resetAgent()
 
   var server = new Hapi.Server()
   server.initialize(function (err) {
+    server.stop()
     t.error(err)
+    t.end()
   })
 })
 
