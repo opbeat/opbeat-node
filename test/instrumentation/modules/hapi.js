@@ -171,10 +171,7 @@ test('request error logging with Error', function (t) {
     http.get('http://localhost:' + server.info.port + '/error', function (res) {
       t.equal(res.statusCode, 200)
 
-      res.on('data', function (chunck) {
-          res.resume()
-      })
-      res.on('end', function () {
+      res.resume().on('end', function () {
         agent._instrumentation._queue._flush()
       })
     })
@@ -220,10 +217,7 @@ test('request error logging with String', function (t) {
     http.get('http://localhost:' + server.info.port + '/error', function (res) {
       t.equal(res.statusCode, 200)
 
-      res.on('data', function (chunck) {
-          res.resume()
-      })
-      res.on('end', function () {
+      res.resume().on('end', function () {
         agent._instrumentation._queue._flush()
       })
     })
@@ -271,10 +265,7 @@ test('request error logging with Object', function (t) {
     http.get('http://localhost:' + server.info.port + '/error', function (res) {
       t.equal(res.statusCode, 200)
 
-      res.on('data', function (chunck) {
-          res.resume()
-      })
-      res.on('end', function () {
+      res.resume().on('end', function () {
         agent._instrumentation._queue._flush()
       })
     })
