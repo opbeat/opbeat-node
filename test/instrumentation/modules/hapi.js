@@ -50,18 +50,15 @@ test('connectionless', function (t) {
 })
 
 test('server error logging with Error', function (t) {
-  t.plan(8)
+  t.plan(6)
 
   var customError = new Error('custom error')
 
-  resetAgent(function (endpoint, headers, data, cb) {
-    t.equal(endpoint, 'transactions')
-    t.deepEqual(data, { transactions: [], traces: { groups: [], raw: [] } })
-
-    server.stop()
-  })
+  resetAgent()
 
   agent.captureError = function (err, opts) {
+    server.stop()
+
     t.equal(err, customError)
     t.ok(opts.extra)
     t.deepEqual(opts.extra.tags, { error: true })
@@ -76,24 +73,19 @@ test('server error logging with Error', function (t) {
     t.error(err, 'start error')
 
     server.log(['error'], customError)
-
-    agent._instrumentation._queue._flush()
   })
 })
 
 test('server error logging with String', function (t) {
-  t.plan(8)
+  t.plan(6)
 
   var customError = 'custom error'
 
-  resetAgent(function (endpoint, headers, data, cb) {
-    t.equal(endpoint, 'transactions')
-    t.deepEqual(data, { transactions: [], traces: { groups: [], raw: [] } })
-
-    server.stop()
-  })
+  resetAgent()
 
   agent.captureError = function (err, opts) {
+    server.stop()
+
     t.equal(err, customError)
     t.ok(opts.extra)
     t.deepEqual(opts.extra.tags, { error: true })
@@ -108,26 +100,21 @@ test('server error logging with String', function (t) {
     t.error(err, 'start error')
 
     server.log(['error'], customError)
-
-    agent._instrumentation._queue._flush()
   })
 })
 
 test('server error logging with Object', function (t) {
-  t.plan(8)
+  t.plan(6)
 
   var customError = {
     error: 'I forgot to turn this into an actual Error'
   }
 
-  resetAgent(function (endpoint, headers, data, cb) {
-    t.equal(endpoint, 'transactions')
-    t.deepEqual(data, { transactions: [], traces: { groups: [], raw: [] } })
-
-    server.stop()
-  })
+  resetAgent()
 
   agent.captureError = function (err, opts) {
+    server.stop()
+
     t.equal(err, 'hapi server emitted a log event tagged error')
     t.ok(opts.extra)
     t.deepEqual(opts.extra.tags, { error: true })
@@ -142,8 +129,6 @@ test('server error logging with Object', function (t) {
     t.error(err, 'start error')
 
     server.log(['error'], customError)
-
-    agent._instrumentation._queue._flush()
   })
 })
 
@@ -187,7 +172,7 @@ test('request error logging with Error', function (t) {
       t.equal(res.statusCode, 200)
 
       res.on('data', function (chunck) {
-          // I need to read this to make `res` end
+          res.resume()
       })
       res.on('end', function () {
         agent._instrumentation._queue._flush()
