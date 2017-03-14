@@ -221,7 +221,7 @@ test('request error logging with String', function (t) {
       t.equal(res.statusCode, 200)
 
       res.on('data', function (chunck) {
-          // I need to read this to make `res` end
+          res.resume()
       })
       res.on('end', function () {
         agent._instrumentation._queue._flush()
@@ -272,7 +272,7 @@ test('request error logging with Object', function (t) {
       t.equal(res.statusCode, 200)
 
       res.on('data', function (chunck) {
-          // I need to read this to make `res` end
+          res.resume()
       })
       res.on('end', function () {
         agent._instrumentation._queue._flush()
