@@ -39,3 +39,6 @@ express-graphql:
   peerDependencies: graphql@0.8.2
   versions: ^0.6.1
   commands: node test/instrumentation/modules/express-graphql.js
+elasticsearch:
+  versions: '>=7.0.0'
+  commands: node test/instrumentation/modules/elasticsearch.js

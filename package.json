@@ -73,6 +73,7 @@
   "devDependencies": {
     "bluebird": "^3.4.6",
     "connect": "^3.5.0",
+    "elasticsearch": "^13.0.0-rc2",
     "express": "^4.14.0",
     "express-graphql": "^0.6.1",
     "generic-pool": "^3.1.5",
@@ -92,6 +93,7 @@
     "tape": "^4.6.3",
     "test-all-versions": "^2.4.2",
     "untildify": "^3.0.2",
+    "wait-on": "^1.5.4",
     "ws": "^2.0.0"
   },
   "greenkeeper": {
