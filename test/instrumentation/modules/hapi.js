@@ -157,38 +157,38 @@ test('server error logging with Error', function (t) {
 })
 
 test('server error logging with Error does not affect event tags', function (t) {
-    t.plan(8)
+  t.plan(8)
 
-    var customError = new Error('custom error')
+  var customError = new Error('custom error')
 
-    resetAgent()
+  resetAgent()
 
-    agent.captureError = function (err, opts) {
-      server.stop()
+  agent.captureError = function (err, opts) {
+    server.stop()
 
-      t.equal(err, customError)
-      t.ok(opts.extra)
-      t.deepEqual(opts.extra.tags, ['error'])
-      t.false(opts.extra.internals)
-      t.ok(opts.extra.data instanceof Error)
-    }
+    t.equal(err, customError)
+    t.ok(opts.extra)
+    t.deepEqual(opts.extra.tags, ['error'])
+    t.false(opts.extra.internals)
+    t.ok(opts.extra.data instanceof Error)
+  }
 
-    var server = new Hapi.Server()
-    server.connection()
+  var server = new Hapi.Server()
+  server.connection()
+
+  server.on('log', function (event, tags) {
+    t.deepEqual(event.tags, ['error'])
+  })
+
+  server.start(function (err) {
+    t.error(err, 'start error')
 
     server.on('log', function (event, tags) {
-        t.deepEqual(event.tags, ['error']);
+      t.deepEqual(event.tags, ['error'])
     })
 
-    server.start(function (err) {
-      t.error(err, 'start error')
-
-      server.on('log', function (event, tags) {
-          t.deepEqual(event.tags, ['error']);
-      })
-
-      server.log(['error'], customError)
-    })
+    server.log(['error'], customError)
+  })
 })
 
 test('server error logging with String', function (t) {
@@ -327,14 +327,14 @@ test('request error logging with Error does not affect event tags', function (t)
   })
 
   server.on('request', function (req, event, tags) {
-      t.deepEqual(event.tags, ['opbeat', 'error']);
+    t.deepEqual(event.tags, ['opbeat', 'error'])
   })
 
   server.start(function (err) {
     t.error(err, 'start error')
 
     server.on('request', function (req, event, tags) {
-        t.deepEqual(event.tags, ['opbeat', 'error']);
+      t.deepEqual(event.tags, ['opbeat', 'error'])
     })
 
     http.get('http://localhost:' + server.info.port + '/error', function (res) {
