@@ -8,8 +8,8 @@ var agent = require('../../../..').start({
 })
 
 var test = require('tape')
-var exec = require('child_process').exec
 var mysql = require('mysql')
+var utils = require('./_utils')
 
 test('release connection prior to transaction', function (t) {
   createPool(function (pool) {
@@ -42,8 +42,5 @@ function createPool (cb) {
 }
 
 function setup (cb) {
-  exec('mysql -u root < mysql_reset.sql', { cwd: __dirname }, function (err) {
-    if (err) throw err
-    cb()
-  })
+  utils.reset(cb)
 }

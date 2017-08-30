@@ -1,2 +1,0 @@
-DROP DATABASE IF EXISTS test_opbeat;
-CREATE DATABASE test_opbeat;
