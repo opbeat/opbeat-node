@@ -769,7 +769,7 @@ function createPool (cb) {
     var connector
 
     if (semver.satisfies(pgVersion, '<6.0.0')) {
-      queryable = pg // TODO: Can this be done?
+      queryable = pg
       connector = function connector (cb) {
         var conString = 'postgres://localhost/test_opbeat'
         return pg.connect(conString, cb)
@@ -778,7 +778,7 @@ function createPool (cb) {
       var pool = new pg.Pool({
         database: 'test_opbeat'
       })
-      queryable = pool // TODO: Can this be done?
+      queryable = pool
       connector = function connector (cb) {
         return pool.connect(cb)
       }
