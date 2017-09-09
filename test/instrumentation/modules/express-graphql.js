@@ -83,6 +83,40 @@ test('GET /graphql', function (t) {
   })
 })
 
+test('POST /graphql - named query', function (t) {
+  resetAgent(done(t, 'HelloQuery hello'))
+
+  var schema = buildSchema('type Query { hello: String }')
+  var root = {hello: function () {
+    t.ok(agent._instrumentation.currentTransaction, 'have active transaction')
+    return 'Hello world!'
+  }}
+  var query = '{"query":"query HelloQuery { hello }"}'
+
+  var app = express()
+  app.use('/graphql', graphqlHTTP({schema: schema, rootValue: root}))
+  var server = app.listen(function () {
+    var port = server.address().port
+    var opts = {
+      method: 'POST',
+      port: port,
+      path: '/graphql',
+      headers: {'Content-Type': 'application/json'}
+    }
+    var req = http.request(opts, function (res) {
+      var chunks = []
+      res.on('data', chunks.push.bind(chunks))
+      res.on('end', function () {
+        server.close()
+        var result = Buffer.concat(chunks).toString()
+        t.equal(result, '{"data":{"hello":"Hello world!"}}')
+        agent._instrumentation._queue._flush()
+      })
+    })
+    req.end(query)
+  })
+})
+
 test('POST /graphql - sort multiple queries', function (t) {
   resetAgent(done(t, 'hello, life'))
 
@@ -124,21 +158,21 @@ test('POST /graphql - sort multiple queries', function (t) {
 })
 
 // { transactions:
-//    [ { transaction: 'hello (/graphql)',
+//    [ { transaction: 'HelloQuery hello (/graphql)',
 //        result: 200,
 //        kind: 'request',
 //        timestamp: '2017-01-30T19:48:00.000Z',
 //        durations: [ 56.084992 ] } ],
 //   traces:
 //    { groups:
-//       [ { transaction: 'hello (/graphql)',
-//           signature: 'GraphQL: hello',
+//       [ { transaction: 'HelloQuery hello (/graphql)',
+//           signature: 'GraphQL: HelloQuery hello',
 //           kind: 'db.graphql.execute',
 //           transaction_kind: 'request',
 //           timestamp: '2017-01-30T19:48:00.000Z',
 //           parents: [ 'transaction' ],
 //           extra: { _frames: [Object] } },
-//         { transaction: 'hello (/graphql)',
+//         { transaction: 'HelloQuery hello (/graphql)',
 //           signature: 'transaction',
 //           kind: 'transaction',
 //           transaction_kind: 'request',
