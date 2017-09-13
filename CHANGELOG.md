@@ -1,3 +1,9 @@
+# 4.15.2 - 2017/9/13
+  * fix(instrumentation): fix setting of custom flushInterval
+  * fix(parser): support http requests with full URI's
+  * fix(trace): don't allow un-started traces to calculate startTime
+  * fix(trace): don't allow un-started traces to be ended
+
 # 4.15.1 - 2017/7/31
   * http/https: fix issue with outgoing http requests ([#179](https://github.com/opbeat/opbeat-node/issues/179))
 
