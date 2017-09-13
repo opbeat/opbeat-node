@@ -55,6 +55,13 @@ test('#getHTTPContextFromRequest()', function (t) {
     t.end()
   })
 
+  t.test('full URI', function (t) {
+    mockReq.url = 'https://www.example.com:8080/some/path?key=value'
+    var parsed = parsers.getHTTPContextFromRequest(mockReq)
+    t.equal(parsed.url, 'https://www.example.com:8080/some/path?key=value')
+    t.end()
+  })
+
   t.test('should slice too large body\'s', function (t) {
     mockReq.body = ''
     for (var n = 0; n < parsers._MAX_HTTP_BODY_CHARS + 10; n++) {
