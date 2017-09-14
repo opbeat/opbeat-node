@@ -1,3 +1,6 @@
+# 4.16.0 - 2017/9/14
+  * feat(graphql): include GraphQL operation name in trace and transaction names ([#195](https://github.com/opbeat/opbeat-node/pull/195))
+
 # 4.15.2 - 2017/9/13
   * fix(instrumentation): fix setting of custom flushInterval
   * fix(parser): support http requests with full URI's
