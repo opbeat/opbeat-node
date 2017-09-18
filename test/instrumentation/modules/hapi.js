@@ -4,7 +4,8 @@ var agent = require('../../..').start({
   appId: 'test',
   organizationId: 'test',
   secretToken: 'test',
-  captureExceptions: false
+  captureExceptions: false,
+  logLevel: 'fatal'
 })
 
 var semver = require('semver')
@@ -15,6 +16,25 @@ if (!semver.satisfies(process.version, '>=4')) process.exit()
 var test = require('tape')
 var http = require('http')
 var Hapi = require('hapi')
+
+var originalCaptureError = agent.captureError
+
+test('extract URL from request', function (t) {
+  resetAgent(function (endpoint, headers, data, cb) {
+    t.equal(data.http.method, 'GET')
+    t.equal(data.http.url, 'http://localhost:' + server.info.port + '/captureError?foo=bar')
+    t.equal(data.http.query_string, 'foo=bar')
+    t.equal(data.http.secure, false)
+    server.stop()
+    t.end()
+  })
+
+  agent.captureError = originalCaptureError
+
+  var server = startServer(function (port) {
+    http.get('http://localhost:' + port + '/captureError?foo=bar')
+  })
+})
 
 test('route naming', function (t) {
   t.plan(19)
@@ -496,6 +516,14 @@ function buildServer () {
     path: '/error',
     handler: function (request, reply) {
       return reply(new Error('foo'))
+    }
+  })
+  server.route({
+    method: 'GET',
+    path: '/captureError',
+    handler: function (request, reply) {
+      agent.captureError(new Error())
+      return reply()
     }
   })
   return server
