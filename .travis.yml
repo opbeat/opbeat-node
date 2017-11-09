@@ -15,6 +15,7 @@ services:
 - postgresql
 
 node_js:
+  - '9'
   - '8'
   - '7.9.0' # currently 7.10.0 fails. For details see: https://github.com/nodejs/node/pull/12861
   - '6'
@@ -28,8 +29,26 @@ jobs:
 
   include:
 
-    # Node.js 8
+    # Node.js 9
     - stage: dependencies
+      node_js: '9'
+      env: TAV=generic-pool,mysql,redis,koa-router
+      script: 'if ! [[ $TRAVIS_BRANCH == greenkeeper/* ]]; then tav --quiet; fi'
+    -
+      node_js: '9'
+      env: TAV=ioredis,pg
+      script: 'if ! [[ $TRAVIS_BRANCH == greenkeeper/* ]]; then tav --quiet; fi'
+    -
+      node_js: '9'
+      env: TAV=bluebird
+      script: 'if ! [[ $TRAVIS_BRANCH == greenkeeper/* ]]; then tav --quiet; fi'
+    -
+      node_js: '9'
+      env: TAV=knex,ws,graphql,express-graphql,elasticsearch
+      script: 'if ! [[ $TRAVIS_BRANCH == greenkeeper/* ]]; then tav --quiet; fi'
+
+    # Node.js 8
+    -
       node_js: '8'
       env: TAV=generic-pool,mysql,redis,koa-router
       script: 'if ! [[ $TRAVIS_BRANCH == greenkeeper/* ]]; then tav --quiet; fi'
