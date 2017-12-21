@@ -44,7 +44,7 @@ jobs:
       script: 'if ! [[ $TRAVIS_BRANCH == greenkeeper/* ]]; then tav --quiet; fi'
     -
       node_js: '9'
-      env: TAV=knex,ws,graphql,express-graphql
+      env: TAV=knex,ws,graphql,express-graphql,hapi
       script: 'if ! [[ $TRAVIS_BRANCH == greenkeeper/* ]]; then tav --quiet; fi'
 
     # Node.js 8
@@ -62,7 +62,7 @@ jobs:
       script: 'if ! [[ $TRAVIS_BRANCH == greenkeeper/* ]]; then tav --quiet; fi'
     -
       node_js: '8'
-      env: TAV=knex,ws,graphql,express-graphql
+      env: TAV=knex,ws,graphql,express-graphql,hapi
       script: 'if ! [[ $TRAVIS_BRANCH == greenkeeper/* ]]; then tav --quiet; fi'
 
     # Node.js 7
@@ -80,7 +80,7 @@ jobs:
       script: 'if ! [[ $TRAVIS_BRANCH == greenkeeper/* ]]; then tav --quiet; fi'
     -
       node_js: '7'
-      env: TAV=knex,ws,graphql,express-graphql
+      env: TAV=knex,ws,graphql,express-graphql,hapi
       script: 'if ! [[ $TRAVIS_BRANCH == greenkeeper/* ]]; then tav --quiet; fi'
 
     # Node.js 6
@@ -98,7 +98,7 @@ jobs:
       script: 'if ! [[ $TRAVIS_BRANCH == greenkeeper/* ]]; then tav --quiet; fi'
     -
       node_js: '6'
-      env: TAV=knex,ws,graphql,express-graphql
+      env: TAV=knex,ws,graphql,express-graphql,hapi
       script: 'if ! [[ $TRAVIS_BRANCH == greenkeeper/* ]]; then tav --quiet; fi'
 
     # Node.js 5
@@ -116,7 +116,7 @@ jobs:
       script: 'if ! [[ $TRAVIS_BRANCH == greenkeeper/* ]]; then tav --quiet; fi'
     -
       node_js: '5'
-      env: TAV=knex,ws,graphql,express-graphql
+      env: TAV=knex,ws,graphql,express-graphql,hapi
       script: 'if ! [[ $TRAVIS_BRANCH == greenkeeper/* ]]; then tav --quiet; fi'
 
     # Node.js 4
@@ -134,7 +134,7 @@ jobs:
       script: 'if ! [[ $TRAVIS_BRANCH == greenkeeper/* ]]; then tav --quiet; fi'
     -
       node_js: '4'
-      env: TAV=knex,ws,graphql,express-graphql
+      env: TAV=knex,ws,graphql,express-graphql,hapi
       script: 'if ! [[ $TRAVIS_BRANCH == greenkeeper/* ]]; then tav --quiet; fi'
 
     # Node.js 0.12
@@ -152,7 +152,7 @@ jobs:
       script: 'if ! [[ $TRAVIS_BRANCH == greenkeeper/* ]]; then tav --quiet; fi'
     -
       node_js: '0.12'
-      env: TAV=knex,ws,graphql,express-graphql
+      env: TAV=knex,ws,graphql,express-graphql,hapi
       script: 'if ! [[ $TRAVIS_BRANCH == greenkeeper/* ]]; then tav --quiet; fi'
 
     # Node.js 0.10
@@ -170,7 +170,7 @@ jobs:
       script: 'if ! [[ $TRAVIS_BRANCH == greenkeeper/* ]]; then tav --quiet; fi'
     -
       node_js: '0.10'
-      env: TAV=knex,ws,graphql,express-graphql
+      env: TAV=knex,ws,graphql,express-graphql,hapi
       script: 'if ! [[ $TRAVIS_BRANCH == greenkeeper/* ]]; then tav --quiet; fi'
 
 notifications:

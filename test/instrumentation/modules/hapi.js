@@ -16,8 +16,11 @@ if (!semver.satisfies(process.version, '>=4')) process.exit()
 var test = require('tape')
 var http = require('http')
 var Hapi = require('hapi')
+var pkg = require('hapi/package.json')
 
 var originalCaptureError = agent.captureError
+
+function noop () {}
 
 test('extract URL from request', function (t) {
   resetAgent(function (endpoint, headers, data, cb) {
@@ -25,7 +28,7 @@ test('extract URL from request', function (t) {
     t.equal(data.http.url, 'http://localhost:' + server.info.port + '/captureError?foo=bar')
     t.equal(data.http.query_string, 'foo=bar')
     t.equal(data.http.secure, false)
-    server.stop()
+    server.stop(noop)
     t.end()
   })
 
@@ -41,7 +44,7 @@ test('route naming', function (t) {
 
   resetAgent(function (endpoint, headers, data, cb) {
     assert(t, data)
-    server.stop()
+    server.stop(noop)
   })
 
   var server = startServer(function (port) {
@@ -58,18 +61,30 @@ test('route naming', function (t) {
 })
 
 test('connectionless', function (t) {
+  if (semver.satisfies(pkg.version, '<15.0.2')) {
+    t.pass('skipping')
+    t.end()
+    return
+  }
+
   t.plan(1)
 
   resetAgent()
 
   var server = new Hapi.Server()
   server.initialize(function (err) {
-    server.stop()
+    server.stop(noop)
     t.error(err, 'start error')
   })
 })
 
 test('connectionless server error logging with Error', function (t) {
+  if (semver.satisfies(pkg.version, '<15.0.2')) {
+    t.pass('skipping')
+    t.end()
+    return
+  }
+
   t.plan(6)
 
   var customError = new Error('custom error')
@@ -77,7 +92,7 @@ test('connectionless server error logging with Error', function (t) {
   resetAgent()
 
   agent.captureError = function (err, opts) {
-    server.stop()
+    server.stop(noop)
 
     t.equal(err, customError)
     t.ok(opts.extra)
@@ -96,6 +111,12 @@ test('connectionless server error logging with Error', function (t) {
 })
 
 test('connectionless server error logging with String', function (t) {
+  if (semver.satisfies(pkg.version, '<15.0.2')) {
+    t.pass('skipping')
+    t.end()
+    return
+  }
+
   t.plan(6)
 
   var customError = 'custom error'
@@ -103,7 +124,7 @@ test('connectionless server error logging with String', function (t) {
   resetAgent()
 
   agent.captureError = function (err, opts) {
-    server.stop()
+    server.stop(noop)
 
     t.equal(err, customError)
     t.ok(opts.extra)
@@ -122,6 +143,12 @@ test('connectionless server error logging with String', function (t) {
 })
 
 test('connectionless server error logging with Object', function (t) {
+  if (semver.satisfies(pkg.version, '<15.0.2')) {
+    t.pass('skipping')
+    t.end()
+    return
+  }
+
   t.plan(6)
 
   var customError = {
@@ -131,7 +158,7 @@ test('connectionless server error logging with Object', function (t) {
   resetAgent()
 
   agent.captureError = function (err, opts) {
-    server.stop()
+    server.stop(noop)
 
     t.equal(err, 'hapi server emitted a log event tagged error')
     t.ok(opts.extra)
@@ -157,7 +184,7 @@ test('server error logging with Error', function (t) {
   resetAgent()
 
   agent.captureError = function (err, opts) {
-    server.stop()
+    server.stop(noop)
 
     t.equal(err, customError)
     t.ok(opts.extra)
@@ -184,7 +211,7 @@ test('server error logging with Error does not affect event tags', function (t) 
   resetAgent()
 
   agent.captureError = function (err, opts) {
-    server.stop()
+    server.stop(noop)
 
     t.equal(err, customError)
     t.ok(opts.extra)
@@ -219,7 +246,7 @@ test('server error logging with String', function (t) {
   resetAgent()
 
   agent.captureError = function (err, opts) {
-    server.stop()
+    server.stop(noop)
 
     t.equal(err, customError)
     t.ok(opts.extra)
@@ -248,7 +275,7 @@ test('server error logging with Object', function (t) {
   resetAgent()
 
   agent.captureError = function (err, opts) {
-    server.stop()
+    server.stop(noop)
 
     t.equal(err, 'hapi server emitted a log event tagged error')
     t.ok(opts.extra)
@@ -275,7 +302,7 @@ test('request error logging with Error', function (t) {
   resetAgent(function (endpoint, headers, data, cb) {
     assert(t, data, { status: 200, name: 'GET /error' })
 
-    server.stop()
+    server.stop(noop)
   })
 
   agent.captureError = function (err, opts) {
@@ -321,7 +348,7 @@ test('request error logging with Error does not affect event tags', function (t)
   resetAgent(function (endpoint, headers, data, cb) {
     assert(t, data, { status: 200, name: 'GET /error' })
 
-    server.stop()
+    server.stop(noop)
   })
 
   agent.captureError = function (err, opts) {
@@ -375,7 +402,7 @@ test('request error logging with String', function (t) {
   resetAgent(function (endpoint, headers, data, cb) {
     assert(t, data, { status: 200, name: 'GET /error' })
 
-    server.stop()
+    server.stop(noop)
   })
 
   agent.captureError = function (err, opts) {
@@ -423,7 +450,7 @@ test('request error logging with Object', function (t) {
   resetAgent(function (endpoint, headers, data, cb) {
     assert(t, data, { status: 200, name: 'GET /error' })
 
-    server.stop()
+    server.stop(noop)
   })
 
   agent.captureError = function (err, opts) {
@@ -466,7 +493,7 @@ test('error handling', function (t) {
 
   resetAgent(function (endpoint, headers, data, cb) {
     assert(t, data, { status: 500, name: 'GET /error' })
-    server.stop()
+    server.stop(noop)
   })
 
   agent.captureError = function (err, opts) {
