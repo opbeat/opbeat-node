@@ -44,7 +44,7 @@ jobs:
       script: 'if ! [[ $TRAVIS_BRANCH == greenkeeper/* ]]; then tav --quiet; fi'
     -
       node_js: '9'
-      env: TAV=knex,ws,graphql,express-graphql,elasticsearch
+      env: TAV=knex,ws,graphql,express-graphql
       script: 'if ! [[ $TRAVIS_BRANCH == greenkeeper/* ]]; then tav --quiet; fi'
 
     # Node.js 8
