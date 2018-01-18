@@ -1,3 +1,9 @@
+# 4.17.0 - 2018/1/18
+  * feat(mongodb): add support for mongodb-core 3.x
+  * feat(ws): add support for ws@4.x
+  * fix(graphql): support sync execute
+  * fix(https): instrument https.request in Node.js v9
+
 # 4.16.0 - 2017/9/14
   * feat(graphql): include GraphQL operation name in trace and transaction names ([#195](https://github.com/opbeat/opbeat-node/pull/195))
 
